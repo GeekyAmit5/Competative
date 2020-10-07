@@ -3,13 +3,17 @@ import sys
 
 sys.setrecursionlimit(10**5)
 
+c = dict()
 
-@lru_cache
+
 def C(n, r):
     if r == n or r == 0:
         return 1
     else:
-        return C(n-1, r) + C(n-1, r-1)
+        ans = C(n-1, r) + C(n-1, r-1)
+        c[(n, r)] = ans
+        c[(n, n-r)] = ans
+        return ans
 
 
 n, r = map(int, input().split())
