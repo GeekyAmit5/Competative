@@ -1,42 +1,51 @@
-import random
-import numpy as np
+from collections import deque
 
 
-def c(x):
-    t = 0
-    for i in range(7):
-        t += ans[i].count(x)
-        if t >= 3:
-            break
-    return t
+class node():
+    def __init__(self, num):
+        self.num = num
+        self.parent = None
+        self.child = []
+
+    def add_child(self, num):
+        self.child.append(num)
+        num.parent = self
+
+    def get_level(self):
+        level = 0
+        temp = self.parent
+        while temp:
+            level += 1
+            temp = temp.parent
+        return level
 
 
-def isValid(job, i):
-    if (i == 0 or job not in ans[i-1]) and job not in ans[i]:
-        if job == 'Free' and c(job) == 0:
-            return True
-        if job != 'Free' and c(job) < 3:
-            return True
-    return False
+def Tree(root):
+    q = deque([root])
+    while q:
+        p = q[0]
+        q.popleft()
+        for i in adjList[p]:
+            if nodes[p].parent != nodes[i] and nodes[i] not in nodes[p].child:
+                nodes[p].add_child(nodes[i])
+                q.append(i)
 
 
-def solve():
-    global ans, depth
-    for i in range(7):
-        for j in range(4):
-            if not ans[i][j]:
-                for job in jobs:
-                    if isValid(job, i):
-                        ans[i][j] = job
-                        solve()
-                        ans[i][j] = 0
-                return
-    print(np.matrix(ans))
-    exit()
-
-
-jobs = ['GT', 'FSaA', 'Coding', 'PaS', 'PDE',
-        'RoFG', 'FA', 'BA', 'NET/GATE', 'Free']
-random.shuffle(jobs)
-ans = [[0 for i in range(4)] for j in range(7)]
-solve()
+n, m = map(int, input().split())
+nodes = [node(i) for i in range(n)]
+adjList = [set() for i in range(n)]
+for i in range(m):
+    a, b = map(int, input().split())
+    adjList[a-1].add(b-1)
+    adjList[b-1].add(a-1)
+Tree(0)
+for i in nodes:
+    print('vertex:', i.num+1)
+    if i.parent:
+        print('Parent:', i.parent.num+1)
+    else:
+        print('Parent:', i.parent)
+    print('Childs:', end='\t')
+    for j in i.child:
+        print(j.num+1, end='\t')
+    print('\n')
